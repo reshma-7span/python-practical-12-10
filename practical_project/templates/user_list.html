@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Users</title>
+</head>
+<body>
+    <h1>All Users</h1>
+    <table border="1">
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Date of Birth</th>
+            <th>Mobile</th>
+            <th>Gender</th>
+            <th>Address</th>
+            <th>Action</th>
+        </tr>
+        {% for user, user_info in user_details %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.user_email }}</td>
+                <td>{% if user_info %}{{ user_info.date_of_birth }}{% endif %}</td>
+                <td>{% if user_info %}{{ user_info.mobile }}{% endif %}</td>
+                <td>{% if user_info %}{{ user_info.gender }}{% endif %}</td>
+                <td>{% if user_info %}{{ user_info.address }}{% endif %}</td>
+                <td>
+                    {% if user_info %}
+                        <form action="{% url 'user_delete' user.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit">Delete</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table><br><br>
+     <a href="{% url 'user_add' %}"><button>Add User</button></a><br>
+    <a href="{% url 'user_export' %}" target="_blank">Export Results</a>
+</body>
+</html>
