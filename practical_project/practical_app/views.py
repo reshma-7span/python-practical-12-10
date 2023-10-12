@@ -118,6 +118,37 @@ class UserExportView(View):
 
 
 
+# =============================================statement-2 ============================================
+
+
+# from .decorators import rate_limit_20_seconds, rate_limit_1_minute,custom_ratelimit_key
+
+import random
+from django.http import JsonResponse
+from rest_framework.views import APIView
+from .decorators import rate_limit_request
+import time
+
+
+class SampleAPIView(APIView):
+
+    @rate_limit_request(identifier='sample_api', timeout=20, limit=10)
+    def get(self, request):
+        # Simulate some processing time
+        time.sleep(1)
+
+        # Return a JSON response with random data
+        data = {
+            'random_key1': random.randint(1, 100),
+            'random_key2': random.random(),
+            'message': 'API response'
+        }
+        return JsonResponse(data, status=status.HTTP_200_OK)
+
+
+
+
+
 
 
 
