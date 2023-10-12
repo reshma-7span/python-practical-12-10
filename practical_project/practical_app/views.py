@@ -119,15 +119,13 @@ class UserExportView(View):
 
 
 # =============================================statement-2 ============================================
-
-
-# from .decorators import rate_limit_20_seconds, rate_limit_1_minute,custom_ratelimit_key
-
+import time
 import random
+from django.core.cache import cache
 from django.http import JsonResponse
+from rest_framework import status
 from rest_framework.views import APIView
 from .decorators import rate_limit_request
-import time
 
 
 class SampleAPIView(APIView):
@@ -144,6 +142,78 @@ class SampleAPIView(APIView):
             'message': 'API response'
         }
         return JsonResponse(data, status=status.HTTP_200_OK)
+
+
+
+# =================================================== statement-3 ========================================
+from PyPDF2 import PdfReader, PdfWriter
+from reportlab.pdfgen import canvas
+from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse
+from django.shortcuts import render
+import os
+import io
+from django.conf import settings
+
+def add_watermark(input_pdf, output_pdf, watermark_text):
+    # Create PDF reader and writer objects
+    pdf_reader = PdfReader(input_pdf)
+    pdf_writer = PdfWriter()
+
+    # Create watermark PDF
+    packet = io.BytesIO()
+    can = canvas.Canvas(packet, pagesize=(8.5 * 72, 11 * 72))  # Standard letter size in points (1 inch = 72 points)
+    can.setFont("Helvetica", 12)
+    can.drawString(100, 100, watermark_text)
+    can.save()
+
+    packet.seek(0)
+    watermark = PdfReader(packet)
+
+    # Add watermark to each page
+    for i in range(len(pdf_reader.pages)):
+        page = pdf_reader.pages[i]
+        page.merge_page(watermark.pages[0])
+        pdf_writer.add_page(page)
+
+    # Write the output PDF
+    with open(output_pdf, 'wb') as output_file:
+        pdf_writer.write(output_file)
+
+def watermark_pdf_view(request):
+    if request.method == 'POST' and request.FILES['pdf_file']:
+        uploaded_file = request.FILES['pdf_file']
+        fs = FileSystemStorage()
+        filename = fs.save(uploaded_file.name, uploaded_file)
+        input_pdf_path = os.path.join(settings.MEDIA_ROOT, filename)
+
+        # Create a watermark
+        watermark_text = "Watermark Sample"
+        output_pdf_path = os.path.join(settings.MEDIA_ROOT, 'output.pdf')
+        add_watermark(input_pdf_path, output_pdf_path, watermark_text)
+
+        # Implement PDF password protection (using PyPDF2)
+        pdf_writer = PdfWriter()
+        pdf_reader = PdfReader(output_pdf_path)
+
+        for page_num in range(len(pdf_reader.pages)):
+            pdf_writer.add_page(pdf_reader.pages[page_num])
+
+        pdf_writer.encrypt("password", "owner_password", use_128bit=True)
+
+        with open(output_pdf_path, 'wb') as output_pdf_file:
+            pdf_writer.write(output_pdf_file)
+
+        return HttpResponse("PDF with watermark and password protection saved.")
+
+    return render(request, 'upload_pdf.html')
+
+
+
+
+
+
+
 
 
 

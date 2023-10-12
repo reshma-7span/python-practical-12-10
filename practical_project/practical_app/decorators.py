@@ -8,7 +8,7 @@ def rate_limit_request(identifier, timeout, limit):
     Decorator to rate limit requests based on identifier.
     """
     def decorator(view_func):
-        def wrapped_view(request, *args, **kwargs):
+        def wrapped_view(self, request, *args, **kwargs):
             cache_key = f"rate_limit:{identifier}:{request.META['REMOTE_ADDR']}"
 
             # Check if the cache key exists and exceeds the limit
@@ -22,7 +22,7 @@ def rate_limit_request(identifier, timeout, limit):
             # Increment the request count and update cache
             cache.set(cache_key, request_count + 1, timeout)
 
-            return view_func(request, *args, **kwargs)
+            return view_func(self, request, *args, **kwargs)
 
         return wrapped_view
 

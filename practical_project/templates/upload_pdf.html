@@ -1,0 +1,34 @@
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--  <title>Watermark PDF</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--  <h1>Watermark PDF</h1>-->
+<!--  <form action="/watermark_pdf/" method="POST" enctype="multipart/form-data">-->
+<!--    {% csrf_token %}-->
+<!--    <p>Select PDF file to watermark:</p>-->
+<!--    <input type="file" name="pdf_file" accept=".pdf" />-->
+<!--    <p>Select watermark file:</p>-->
+<!--    <input type="file" name="watermark_file" accept=".pdf" />-->
+<!--    <p>Enter password to protect output file (optional):</p>-->
+<!--    <input type="password" name="password" />-->
+<!--    <input type="submit" value="Watermark PDF" />-->
+<!--  </form>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload PDF and Add Watermark</title>
+</head>
+<body>
+    <h1>Upload PDF and Add Watermark</h1>
+    <form action="{% url 'watermark_pdf_view' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="pdf_file" accept="application/pdf" required>
+        <button type="submit">Upload and Add Watermark</button>
+    </form>
+</body>
+</html>
